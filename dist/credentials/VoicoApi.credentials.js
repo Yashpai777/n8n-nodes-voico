@@ -13,8 +13,6 @@ class VoicoApi {
                 type: 'string',
                 typeOptions: { password: true },
                 default: '',
-                required: true,
-                hint: 'Get your API key from platform.voico.ai/docs',
             },
         ];
         this.authenticate = {
@@ -29,7 +27,6 @@ class VoicoApi {
             request: {
                 baseURL: 'https://api.voico.ai',
                 url: '/api/calls',
-                method: 'GET',
             },
         };
     }
