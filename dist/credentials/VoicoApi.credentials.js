@@ -5,6 +5,7 @@ class VoicoApi {
     constructor() {
         this.name = 'voicoApi';
         this.displayName = 'Voico API';
+        this.documentationUrl = 'https://platform.voico.ai/docs';
         this.properties = [
             {
                 displayName: 'API Key',
@@ -15,6 +16,21 @@ class VoicoApi {
                 required: true,
             },
         ];
+        this.authenticate = {
+            type: 'generic',
+            properties: {
+                headers: {
+                    Authorization: '={{$credentials.apiKey}}',
+                },
+            },
+        };
+        this.test = {
+            request: {
+                baseURL: 'https://api.voico.ai',
+                url: '/api/calls',
+                method: 'GET',
+            },
+        };
     }
 }
 exports.VoicoApi = VoicoApi;
