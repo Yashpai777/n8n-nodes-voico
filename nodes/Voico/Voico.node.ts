@@ -6,10 +6,6 @@
 	INodeTypeDescription,
 } from 'n8n-workflow';
 
-type VoicoCredentials = {
-	apiKey: string;
-};
-
 export class Voico implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Voico',
@@ -17,7 +13,7 @@ export class Voico implements INodeType {
 		icon: 'file:voico.svg',
 		group: ['transform'],
 		version: 1,
-		description: 'AI Voice Agent — Make outbound calls, get call details and transcripts',
+		description: 'AI Voice Agent — Make outbound AI calls, get call details and transcripts',
 		defaults: {
 			name: 'Voico',
 		},
@@ -42,8 +38,6 @@ export class Voico implements INodeType {
 				],
 				default: 'makeCall',
 			},
-
-			// ── MAKE CALL FIELDS ──
 			{
 				displayName: 'Phone Number',
 				name: 'phone',
@@ -52,7 +46,7 @@ export class Voico implements INodeType {
 				default: '',
 				required: true,
 				placeholder: '+919999999999',
-				description: 'Customer phone number with country code e.g. +491234567890',
+				description: 'Customer phone number with country code',
 			},
 			{
 				displayName: 'Agent ID',
@@ -88,12 +82,9 @@ export class Voico implements INodeType {
 				type: 'string',
 				displayOptions: { show: { operation: ['makeCall'] } },
 				default: '',
-				required: false,
 				placeholder: '2024-01-15T10:30:00Z',
 				description: 'Optional: ISO 8601 datetime to schedule the call. Leave empty to call in 1 minute.',
 			},
-
-			// ── GET CALL / GET TRANSCRIPT FIELDS ──
 			{
 				displayName: 'Call ID',
 				name: 'callId',
@@ -109,9 +100,6 @@ export class Voico implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
-
-		const rawCreds = (await this.getCredentials('voicoApi')) as unknown as VoicoCredentials;
-		const apiKey = rawCreds.apiKey;
 		const baseUrl = 'https://api.voico.ai';
 
 		for (let i = 0; i < items.length; i++) {
@@ -127,70 +115,64 @@ export class Voico implements INodeType {
 				const prompt = this.getNodeParameter('prompt', i) as string;
 				const scheduledTime = this.getNodeParameter('scheduledTime', i) as string;
 
-				// Default: schedule 1 minute from now
 				const callTime = scheduledTime
 					? scheduledTime
 					: new Date(Date.now() + 60000).toISOString();
 
-				// Ensure phone has + prefix
 				const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
 
-				// Build customer object
-				const customer: IDataObject = {
-					phone: formattedPhone,
-				};
+				const customer: IDataObject = { phone: formattedPhone };
 				if (firstMessage) customer.first_message = firstMessage;
 				if (prompt) customer.prompt = prompt;
 
-				// Make the API call
-				response = await this.helpers.httpRequest({
-					method: 'POST',
-					url: `${baseUrl}/api/outbound-call/`,
-					headers: {
-						Authorization: apiKey,
-						'Content-Type': 'application/json',
+				response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'voicoApi',
+					{
+						method: 'POST',
+						url: `${baseUrl}/api/outbound-call/`,
+						headers: { 'Content-Type': 'application/json' },
+						body: {
+							agent_id: agentId,
+							scheduled_time: callTime,
+							customers: [customer],
+						},
+						json: true,
 					},
-					body: {
-						agent_id: agentId,
-						scheduled_time: callTime,
-						customers: [customer],
-					},
-					json: true,
-				});
+				);
 
 			} else if (operation === 'getCall') {
 
 				const callId = this.getNodeParameter('callId', i) as string;
 
-				response = await this.helpers.httpRequest({
-					method: 'GET',
-					url: `${baseUrl}/api/calls/${callId}`,
-					headers: {
-						Authorization: apiKey,
-						'Content-Type': 'application/json',
+				response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'voicoApi',
+					{
+						method: 'GET',
+						url: `${baseUrl}/api/calls/${callId}`,
+						json: true,
 					},
-					json: true,
-				});
+				);
 
 			} else if (operation === 'getTranscript') {
 
 				const callId = this.getNodeParameter('callId', i) as string;
 
-				response = await this.helpers.httpRequest({
-					method: 'GET',
-					url: `${baseUrl}/api/calls/transcripts?call_id=${callId}`,
-					headers: {
-						Authorization: apiKey,
-						'Content-Type': 'application/json',
+				response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'voicoApi',
+					{
+						method: 'GET',
+						url: `${baseUrl}/api/calls/transcripts?call_id=${callId}`,
+						json: true,
 					},
-					json: true,
-				});
+				);
 
 			} else {
 				throw new Error(`Unknown operation: ${operation}`);
 			}
 
-			// Wrap response safely
 			const json: IDataObject =
 				response !== null && typeof response === 'object' && !Array.isArray(response)
 					? (response as IDataObject)
