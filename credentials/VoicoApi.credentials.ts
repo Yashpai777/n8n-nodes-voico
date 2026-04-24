@@ -17,6 +17,12 @@ type: 'string',
 typeOptions: { password: true },
 default: '',
 },
+{
+displayName: 'Base URL',
+name: 'domain',
+type: 'string',
+default: 'https://api.voico.ai',
+},
 ];
 authenticate: IAuthenticateGeneric = {
 type: 'generic',
@@ -28,7 +34,7 @@ Authorization: '={{$credentials.apiKey}}',
 };
 test: ICredentialTestRequest = {
 request: {
-baseURL: 'https://api.voico.ai',
+baseURL: '={{$credentials?.domain}}',
 url: '/api/calls',
 },
 };
