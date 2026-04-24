@@ -7,8 +7,11 @@
 
 export class VoicoApi implements ICredentialType {
 	name = 'voicoApi';
+
 	displayName = 'Voico API';
+
 	documentationUrl = 'https://platform.voico.ai/docs';
+
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',
@@ -17,6 +20,7 @@ export class VoicoApi implements ICredentialType {
 			typeOptions: { password: true },
 			default: '',
 			required: true,
+			hint: 'Get your API key from platform.voico.ai/docs',
 		},
 	];
 

@@ -14,6 +14,7 @@ class VoicoApi {
                 typeOptions: { password: true },
                 default: '',
                 required: true,
+                hint: 'Get your API key from platform.voico.ai/docs',
             },
         ];
         this.authenticate = {
