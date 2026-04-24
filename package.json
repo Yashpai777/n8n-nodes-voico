@@ -1,0 +1,33 @@
+{
+  "name": "n8n-nodes-voico",
+  "version": "0.1.5",
+  "description": "Voico AI Voice Agent",
+  "author": {
+    "name": "Voico AI",
+    "email": "yash@voico.ai"
+  },
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "n8n-node dev",
+    "build": "n8n-node build"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/VoicoApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Voico/Voico.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "*",
+    "n8n": "^2.7.5"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
