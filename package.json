@@ -22,7 +22,9 @@
     "calls",
     "automation"
   ],
-  "license": "MIT",
+  "license": "MIT","files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "n8n-node dev",
     "build": "n8n-node build"
