@@ -14,12 +14,6 @@ class VoicoApi {
                 typeOptions: { password: true },
                 default: '',
             },
-            {
-                displayName: 'Base URL',
-                name: 'domain',
-                type: 'string',
-                default: 'https://api.voico.ai',
-            },
         ];
         this.authenticate = {
             type: 'generic',
@@ -31,7 +25,7 @@ class VoicoApi {
         };
         this.test = {
             request: {
-                baseURL: '={{$credentials?.domain}}',
+                baseURL: 'https://api.voico.ai',
                 url: '/api/calls',
             },
         };
