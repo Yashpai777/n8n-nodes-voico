@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-voico",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Voico AI Voice Agent — Make outbound AI calls, get call details and transcripts directly in N8N",
   "author": {
     "name": "Voico AI",
